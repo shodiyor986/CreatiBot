@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BotForge - To'lov</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 20px;
+        }
+        .price {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .price-amount {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--tg-theme-button-color, #0088cc);
+        }
+        .features {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .feature {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .method {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .wallet-address {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="price">
+            <div class="price-amount">$15</div>
+            <div>1 oylik premium obuna</div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">✅ Oyiga 10 tagacha bot yaratish</div>
+            <div class="feature">✅ Kanal va guruhlarni boshqarish</div>
+            <div class="feature">✅ Web App botlar yaratish</div>
+            <div class="feature">✅ Cheksiz xabar yuborish</div>
+            <div class="feature">✅ Prioritet texnik yordam</div>
+        </div>
+        
+        <div class="method" onclick="selectMethod('paystack')">
+            <div>💳</div>
+            <div>
+                <strong>Paystack (Karta)</strong><br>
+                <small>Visa, Mastercard, Uzcard</small>
+            </div>
+        </div>
+        
+        <div class="method" onclick="selectMethod('usdt')">
+            <div>₿</div>
+            <div>
+                <strong>USDT (TRC20)</strong><br>
+                <small>Kripto valyuta</small>
+            </div>
+        </div>
+        
+        <div id="usdtInfo" style="display:none; margin-top: 20px;">
+            <div class="wallet-address" id="walletAddress">Yuklanmoqda...</div>
+            <button onclick="copyAddress()">📋 Manzilni nusxalash</button>
+            <button onclick="confirmPayment()">✅ To'lov qildim</button>
+        </div>
+    </div>
+    
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        function selectMethod(method) {
+            if (method === 'paystack') {
+                tg.sendData(JSON.stringify({
+                    action: 'pay_paystack'
+                }));
+                tg.close();
+            } else if (method === 'usdt') {
+                document.getElementById('usdtInfo').style.display = 'block';
+                document.getElementById('walletAddress').innerText = 'YOUR_USDT_WALLET_ADDRESS';
+            }
+        }
+        
+        function copyAddress() {
+            const address = document.getElementById('walletAddress').innerText;
+            navigator.clipboard.writeText(address);
+            tg.showPopup({
+                title: "Nusxalandi",
+                message: "USDT manzili nusxalandi!",
+                buttons: [{type: "ok"}]
+            });
+        }
+        
+        function confirmPayment() {
+            tg.sendData(JSON.stringify({
+                action: 'confirm_payment',
+                txid: 'manual_' + Date.now()
+            }));
+            tg.close();
+        }
+    </script>
+</body>
+</html>
