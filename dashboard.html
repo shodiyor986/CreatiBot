@@ -1,115 +1,271 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>BotForge - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            padding: 20px;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-        .stat-number { font-size: 32px; font-weight: bold; }
-        .stat-label { font-size: 14px; opacity: 0.7; margin-top: 5px; }
-        .menu-item {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .menu-icon { font-size: 24px; }
-        .menu-text { flex: 1; }
-        .menu-title { font-weight: bold; margin-bottom: 4px; }
-        .menu-desc { font-size: 12px; opacity: 0.7; }
-    </style>
 </head>
 <body>
     <div class="container">
-        <h1>📊 Dashboard</h1>
-        
-        <div class="stats">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <div style="font-size: 14px; color: var(--text-secondary);">Salom,</div>
+                <div style="font-size: 20px; font-weight: 700;" id="userName">Foydalanuvchi</div>
+            </div>
+            <div id="avatar" style="
+                width: 44px; height: 44px;
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 20px;
+            ">👤</div>
+        </div>
+
+        <!-- Statistika -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
             <div class="stat-card">
                 <div class="stat-number" id="botCount">0</div>
-                <div class="stat-label">Mening botlarim</div>
+                <div class="stat-label">🤖 Botlar</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="premiumStatus">❌</div>
-                <div class="stat-label">Premium status</div>
+                <div class="stat-number" id="channelCount">0</div>
+                <div class="stat-label">📢 Kanallar</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="premiumStatus">🆓</div>
+                <div class="stat-label">Status</div>
             </div>
         </div>
-        
-        <div class="menu-item" onclick="action('newbot')">
-            <div class="menu-icon">➕</div>
-            <div class="menu-text">
-                <div class="menu-title">Yangi bot yaratish</div>
-                <div class="menu-desc">Scratch bloklar orqali bot yarating</div>
+
+        <!-- Premium banner (agar bepul bo'lsa) -->
+        <div id="premiumBanner" class="glass-card" style="
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.1));
+            border-color: rgba(245,158,11,0.3);
+            cursor: pointer;
+            display: none;
+        " onclick="window.location.href='payment.html'">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="font-size: 36px;">💎</div>
+                <div>
+                    <div style="font-weight: 700; margin-bottom: 4px;">Premium oling!</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">
+                        10 bot • Kanal boshqaruv • $15/oy
+                    </div>
+                </div>
+                <div style="margin-left: auto; color: #fcd34d; font-size: 20px;">→</div>
             </div>
         </div>
-        
-        <div class="menu-item" onclick="action('mybots')">
-            <div class="menu-icon">🤖</div>
-            <div class="menu-text">
-                <div class="menu-title">Mening botlarim</div>
-                <div class="menu-desc">Botlaringizni boshqaring</div>
+
+        <!-- Asosiy menyu -->
+        <div class="section-title">⚡ Menyu</div>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="window.location.href='index.html'">
+                <span class="menu-emoji">🤖</span>
+                <div class="menu-label">Yangi bot</div>
+            </div>
+            <div class="menu-item" onclick="showMyBots()">
+                <span class="menu-emoji">📋</span>
+                <div class="menu-label">Mening botlarim</div>
+            </div>
+            <div class="menu-item" onclick="showChannels()">
+                <span class="menu-emoji">📢</span>
+                <div class="menu-label">Kanallar</div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='payment.html'">
+                <span class="menu-emoji">💎</span>
+                <div class="menu-label">Premium</div>
             </div>
         </div>
-        
-        <div class="menu-item" onclick="action('channels')">
-            <div class="menu-icon">📢</div>
-            <div class="menu-text">
-                <div class="menu-title">Kanal va guruhlar</div>
-                <div class="menu-desc">Kanallaringizni boshqaring</div>
+
+        <!-- Mening botlarim ro'yxati -->
+        <div id="botsSection" style="display: none;">
+            <div class="section-title">📋 Mening botlarim</div>
+            <div id="botsList">
+                <div class="spinner"></div>
             </div>
         </div>
-        
-        <div class="menu-item" onclick="action('subscribe')">
-            <div class="menu-icon">🌟</div>
-            <div class="menu-text">
-                <div class="menu-title">Premium obuna</div>
-                <div class="menu-desc">Ko'proq imkoniyatlarga ega bo'ling</div>
+
+        <!-- Kanallar ro'yxati -->
+        <div id="channelsSection" style="display: none;">
+            <div class="section-title">📢 Mening kanallarim</div>
+            <div id="channelsList">
+                <div class="spinner"></div>
             </div>
         </div>
+
+        <div class="bottom-space"></div>
     </div>
-    
+
+    <div class="toast" id="toast"></div>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
-        
-        // Ma'lumotlarni yuklash
-        fetch('/api/user_stats')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('botCount').innerText = data.bot_count || 0;
-                document.getElementById('premiumStatus').innerHTML = data.is_premium ? '✅' : '❌';
-            });
-        
-        function action(action_name) {
-            tg.sendData(JSON.stringify({
-                action: action_name
-            }));
-            tg.close();
+
+        const SHEETDB_URL = 'https://sheetdb.io/api/v1/53jj6rji62pdg';
+        const user = tg.initDataUnsafe?.user;
+
+        // Foydalanuvchi nomini ko'rsatish
+        if (user) {
+            document.getElementById('userName').textContent = user.first_name || 'Foydalanuvchi';
+            if (user.username) {
+                document.getElementById('avatar').textContent = user.first_name?.[0]?.toUpperCase() || '👤';
+            }
         }
+
+        // Ma'lumotlarni yuklash
+        async function loadData() {
+            if (!user) return;
+
+            try {
+                // Botlar
+                const botsResp = await fetch(`${SHEETDB_URL}/search?sheet=bots&owner_id=${user.id}`);
+                const bots = await botsResp.json();
+                const activeBots = Array.isArray(bots) ? bots.filter(b => b.status !== 'deleted') : [];
+                document.getElementById('botCount').textContent = activeBots.length;
+
+                // Kanallar
+                const chResp = await fetch(`${SHEETDB_URL}/search?sheet=channels&user_id=${user.id}`);
+                const channels = await chResp.json();
+                const activeChannels = Array.isArray(channels) ? channels.filter(c => c.is_active !== 'false') : [];
+                document.getElementById('channelCount').textContent = activeChannels.length;
+
+                // Premium status
+                const userResp = await fetch(`${SHEETDB_URL}/search?sheet=users&telegram_id=${user.id}`);
+                const users = await userResp.json();
+                if (Array.isArray(users) && users[0]) {
+                    const isPrem = users[0].is_premium === 'true';
+                    document.getElementById('premiumStatus').textContent = isPrem ? '💎' : '🆓';
+                    if (!isPrem) {
+                        document.getElementById('premiumBanner').style.display = 'block';
+                    }
+                    localStorage.setItem(`premium_${user.id}`, isPrem ? 'true' : 'false');
+                }
+
+            } catch (e) {
+                console.error('Ma\'lumot yuklashda xato:', e);
+            }
+        }
+
+        function showMyBots() {
+            const section = document.getElementById('botsSection');
+            const channelsSection = document.getElementById('channelsSection');
+            channelsSection.style.display = 'none';
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                loadBots();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function showChannels() {
+            const section = document.getElementById('channelsSection');
+            const botsSection = document.getElementById('botsSection');
+            botsSection.style.display = 'none';
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                loadChannels();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        async function loadBots() {
+            if (!user) return;
+            const list = document.getElementById('botsList');
+            list.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                const resp = await fetch(`${SHEETDB_URL}/search?sheet=bots&owner_id=${user.id}`);
+                const bots = await resp.json();
+                const active = Array.isArray(bots) ? bots.filter(b => b.status !== 'deleted') : [];
+
+                if (active.length === 0) {
+                    list.innerHTML = `
+                        <div class="glass-card" style="text-align:center;">
+                            <div style="font-size:32px;margin-bottom:8px">🤖</div>
+                            <p style="color:var(--text-secondary)">Hali bot yaratilmagan</p>
+                            <button class="btn btn-primary" style="margin-top:12px;" onclick="window.location.href='index.html'">
+                                ➕ Bot yaratish
+                            </button>
+                        </div>`;
+                    return;
+                }
+
+                const typeEmoji = {button: '🎛', message: '💬', webapp: '🌐'};
+                list.innerHTML = active.map(bot => `
+                    <div class="glass-card" style="margin-bottom:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="font-size:28px;">${typeEmoji[bot.bot_type] || '🤖'}</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;">${bot.name}</div>
+                                <div style="font-size:12px;color:var(--text-secondary);">
+                                    ${bot.created_at?.slice(0,10) || ''}
+                                </div>
+                            </div>
+                            <span class="tag ${bot.status === 'active' ? 'tag-success' : 'tag-danger'}">
+                                ${bot.status === 'active' ? '🟢 Aktiv' : '🔴 To\'xtatilgan'}
+                            </span>
+                        </div>
+                    </div>`).join('');
+            } catch(e) {
+                list.innerHTML = '<div class="alert alert-danger">⚠️ Yuklashda xato</div>';
+            }
+        }
+
+        async function loadChannels() {
+            if (!user) return;
+            const list = document.getElementById('channelsList');
+            list.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                const resp = await fetch(`${SHEETDB_URL}/search?sheet=channels&user_id=${user.id}`);
+                const channels = await resp.json();
+                const active = Array.isArray(channels) ? channels.filter(c => c.is_active !== 'false') : [];
+
+                if (active.length === 0) {
+                    list.innerHTML = `
+                        <div class="glass-card" style="text-align:center;">
+                            <div style="font-size:32px;margin-bottom:8px">📢</div>
+                            <p style="color:var(--text-secondary)">Hali kanal qo'shilmagan</p>
+                        </div>`;
+                    return;
+                }
+
+                list.innerHTML = active.map(ch => `
+                    <div class="glass-card" style="margin-bottom:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="font-size:28px;">${ch.channel_type === 'channel' ? '📢' : '👥'}</div>
+                            <div>
+                                <div style="font-weight:700;">${ch.channel_name}</div>
+                                <div style="font-size:12px;color:var(--text-secondary);">${ch.channel_id}</div>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            } catch(e) {
+                list.innerHTML = '<div class="alert alert-danger">⚠️ Yuklashda xato</div>';
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Back button
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => window.location.href = 'index.html');
+
+        loadData();
     </script>
 </body>
 </html>
