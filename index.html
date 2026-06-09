@@ -1,60 +1,505 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CreatiBot - NoCode Web App Panel</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebCraft Pro — Web Ilova Yaratuvchi</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="app-container">
-        <h2>🛠 CreatiBot Konstruktor</h2>
-        <p id="user-info">Yuklanmoqda...</p>
 
-        <hr>
-
-        <div class="section" id="bot-settings">
-            <h3>1. Bot Sozlamalari</h3>
-            <label>BotFather Bergan Token:</label>
-            <input type="text" id="bot-token" placeholder="123456:ABC-DEF...">
-            <button onclick="saveBotSettings()">Tokenni Saqlash</button>
-        </div>
-
-        <div class="section" id="designer-panel">
-            <h3>2. Bot/Web App Dizayni</h3>
-            
-            <label>Ilova Sarlavhasi (Header):</label>
-            <input type="text" id="app-title" placeholder="Mening Onlayn Do'konim">
-
-            <label>Asosiy Rang (Hex):</label>
-            <input type="color" id="app-color" value="#3498db">
-
-            <label>Bot uchun Rasm (Banner):</label>
-            <input type="file" id="app-image" accept="image/*">
-            <small id="upload-status"></small>
-
-            <label>Tugma Matni:</label>
-            <input type="text" id="btn-text" placeholder="🛍 Buyurtma berish">
-
-            <button onclick="saveDesign()" class="success-btn">Dizaynni Saqlash va URL olish</button>
-        </div>
-
-        <div class="section hidden" id="url-output">
-            <h3>🎉 Bot Web App Tayyor!</h3>
-            <p>Quyidagi URL manzilini nusxalang va BotFather'dagi botingizga (New Web App) joylashtiring:</p>
-            <input type="text" id="generated-url" readonly onclick="this.select()">
-        </div>
-
-        <div class="section hidden" id="billing-section">
-            <h3 style="color: red;">⚠️ Obuna muddati tugagan</h3>
-            <p>Botni faollashtirish uchun 15$ to'lov qiling.</p>
-            <button onclick="redirectToPayme()" class="pay-btn">Payme orqali to'lash</button>
-            <button onclick="redirectToClick()" class="pay-btn">Click orqali to'lash</button>
-        </div>
+  <!-- ===== TOP NAVBAR ===== -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <div class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">WebCraft <span class="logo-pro">Pro</span></span>
+      </div>
+      <div class="project-name-wrap">
+        <input type="text" id="projectName" class="project-name-input" value="Mening Loyiham" />
+        <span class="edit-icon">✎</span>
+      </div>
     </div>
+    <div class="navbar-center">
+      <button class="nav-btn active" data-view="design" onclick="switchView('design')">
+        <span>🎨</span> Dizayn
+      </button>
+      <button class="nav-btn" data-view="code" onclick="switchView('code')">
+        <span>💻</span> Kod
+      </button>
+      <button class="nav-btn" data-view="preview" onclick="switchView('preview')">
+        <span>👁</span> Ko'rinish
+      </button>
+      <button class="nav-btn" data-view="data" onclick="switchView('data')">
+        <span>🗄</span> Ma'lumotlar
+      </button>
+    </div>
+    <div class="navbar-right">
+      <button class="btn-secondary" onclick="saveProject()">💾 Saqlash</button>
+      <button class="btn-secondary" onclick="exportProject()">📦 Export</button>
+      <button class="btn-primary" onclick="publishProject()">🚀 Nashr qilish</button>
+      <div class="user-avatar" title="Foydalanuvchi">B</div>
+    </div>
+  </header>
 
-    <script src="billing.js"></script>
-    <script src="app.js"></script>
+  <!-- ===== MAIN LAYOUT ===== -->
+  <main class="main-layout">
+
+    <!-- LEFT PANEL: Elements -->
+    <aside class="panel-left" id="leftPanel">
+      <div class="panel-header">
+        <span>Elementlar</span>
+        <button class="panel-toggle" onclick="togglePanel('left')">◀</button>
+      </div>
+
+      <div class="search-wrap">
+        <input type="text" class="search-input" placeholder="🔍 Element qidirish..." oninput="filterElements(this.value)" />
+      </div>
+
+      <div class="elements-section">
+        <div class="section-label">Asosiy</div>
+        <div class="elements-grid">
+          <div class="element-card" draggable="true" data-type="text" ondragstart="onDragStart(event)">
+            <span class="el-icon">T</span>
+            <span>Matn</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="heading" ondragstart="onDragStart(event)">
+            <span class="el-icon">H</span>
+            <span>Sarlavha</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="button" ondragstart="onDragStart(event)">
+            <span class="el-icon">◻</span>
+            <span>Tugma</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="image" ondragstart="onDragStart(event)">
+            <span class="el-icon">🖼</span>
+            <span>Rasm</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="divider" ondragstart="onDragStart(event)">
+            <span class="el-icon">—</span>
+            <span>Chiziq</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="spacer" ondragstart="onDragStart(event)">
+            <span class="el-icon">↕</span>
+            <span>Bo'shliq</span>
+          </div>
+        </div>
+
+        <div class="section-label">Forma</div>
+        <div class="elements-grid">
+          <div class="element-card" draggable="true" data-type="input" ondragstart="onDragStart(event)">
+            <span class="el-icon">▭</span>
+            <span>Maydon</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="textarea" ondragstart="onDragStart(event)">
+            <span class="el-icon">≡</span>
+            <span>Tekstbox</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="select" ondragstart="onDragStart(event)">
+            <span class="el-icon">▾</span>
+            <span>Tanlash</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="checkbox" ondragstart="onDragStart(event)">
+            <span class="el-icon">☑</span>
+            <span>Belgi</span>
+          </div>
+        </div>
+
+        <div class="section-label">Layout</div>
+        <div class="elements-grid">
+          <div class="element-card" draggable="true" data-type="container" ondragstart="onDragStart(event)">
+            <span class="el-icon">⊡</span>
+            <span>Konteyner</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="row" ondragstart="onDragStart(event)">
+            <span class="el-icon">⊟</span>
+            <span>Qator</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="card" ondragstart="onDragStart(event)">
+            <span class="el-icon">⊞</span>
+            <span>Karta</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="navbar" ondragstart="onDragStart(event)">
+            <span class="el-icon">☰</span>
+            <span>Navbar</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="footer" ondragstart="onDragStart(event)">
+            <span class="el-icon">⊟</span>
+            <span>Footer</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="hero" ondragstart="onDragStart(event)">
+            <span class="el-icon">★</span>
+            <span>Hero</span>
+          </div>
+        </div>
+
+        <div class="section-label">Media</div>
+        <div class="elements-grid">
+          <div class="element-card" draggable="true" data-type="video" ondragstart="onDragStart(event)">
+            <span class="el-icon">▶</span>
+            <span>Video</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="gallery" ondragstart="onDragStart(event)">
+            <span class="el-icon">⊞</span>
+            <span>Galereya</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="icon" ondragstart="onDragStart(event)">
+            <span class="el-icon">✦</span>
+            <span>Ikonka</span>
+          </div>
+          <div class="element-card" draggable="true" data-type="map" ondragstart="onDragStart(event)">
+            <span class="el-icon">📍</span>
+            <span>Xarita</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="upload-section">
+        <div class="section-label">Rasmlar (ImgBB)</div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('imgUpload').click()">
+          <input type="file" id="imgUpload" accept="image/*" style="display:none" multiple onchange="uploadImages(event)" />
+          <span class="upload-icon">📤</span>
+          <p>Rasm yuklash</p>
+          <span class="upload-hint">PNG, JPG, GIF • Max 32MB</span>
+        </div>
+        <div class="uploaded-images" id="uploadedImages"></div>
+      </div>
+    </aside>
+
+    <!-- CENTER: Canvas -->
+    <section class="canvas-area" id="canvasArea">
+      <div class="canvas-toolbar">
+        <div class="canvas-toolbar-left">
+          <button class="tool-btn active" onclick="setTool('select')" title="Tanlash">↖</button>
+          <button class="tool-btn" onclick="setTool('hand')" title="Harakatlantirish">✋</button>
+          <div class="separator"></div>
+          <button class="tool-btn" onclick="undoAction()" title="Orqaga">↩</button>
+          <button class="tool-btn" onclick="redoAction()" title="Oldinga">↪</button>
+          <div class="separator"></div>
+          <button class="tool-btn" onclick="deleteSelected()" title="O'chirish">🗑</button>
+          <button class="tool-btn" onclick="duplicateSelected()" title="Ko'paytirish">⧉</button>
+        </div>
+        <div class="canvas-toolbar-center">
+          <span class="canvas-size-label">Kenglik:</span>
+          <select class="canvas-size-select" onchange="changeCanvasSize(this.value)">
+            <option value="1280">Desktop (1280px)</option>
+            <option value="1024">Laptop (1024px)</option>
+            <option value="768">Tablet (768px)</option>
+            <option value="375">Mobile (375px)</option>
+          </select>
+        </div>
+        <div class="canvas-toolbar-right">
+          <button class="tool-btn" onclick="zoomOut()">－</button>
+          <span class="zoom-level" id="zoomLevel">100%</span>
+          <button class="tool-btn" onclick="zoomIn()">＋</button>
+          <button class="tool-btn" onclick="resetZoom()">⊡</button>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <div
+          class="canvas"
+          id="canvas"
+          ondragover="event.preventDefault()"
+          ondrop="onDrop(event)"
+          onclick="onCanvasClick(event)"
+        >
+          <!-- Elements will be added here -->
+          <div class="canvas-empty-hint" id="canvasEmptyHint">
+            <div class="hint-icon">🎨</div>
+            <p>Elementlarni shu yerga tortib tashlang</p>
+            <span>yoki chapdan element tanlang</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Responsive ruler -->
+      <div class="canvas-ruler" id="canvasRuler"></div>
+    </section>
+
+    <!-- RIGHT PANEL: Properties -->
+    <aside class="panel-right" id="rightPanel">
+      <div class="panel-header">
+        <button class="panel-toggle" onclick="togglePanel('right')">▶</button>
+        <span>Xususiyatlar</span>
+      </div>
+
+      <div class="props-empty" id="propsEmpty">
+        <span>👆</span>
+        <p>Element tanlang</p>
+      </div>
+
+      <div class="props-content" id="propsContent" style="display:none">
+        <!-- Dynamic properties injected by JS -->
+      </div>
+
+      <!-- Style panel -->
+      <div class="style-panel" id="stylePanel">
+        <div class="panel-section">
+          <div class="section-label">Joylashuv</div>
+          <div class="props-row">
+            <div class="prop-group">
+              <label>X</label>
+              <input type="number" id="propX" class="prop-input" onchange="updateProp('x', this.value)" />
+            </div>
+            <div class="prop-group">
+              <label>Y</label>
+              <input type="number" id="propY" class="prop-input" onchange="updateProp('y', this.value)" />
+            </div>
+          </div>
+          <div class="props-row">
+            <div class="prop-group">
+              <label>Kenglik</label>
+              <input type="text" id="propW" class="prop-input" placeholder="auto" onchange="updateProp('width', this.value)" />
+            </div>
+            <div class="prop-group">
+              <label>Balandlik</label>
+              <input type="text" id="propH" class="prop-input" placeholder="auto" onchange="updateProp('height', this.value)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-label">Shrift</div>
+          <div class="prop-group full">
+            <label>Oila</label>
+            <select id="propFontFamily" class="prop-select" onchange="updateStyle('fontFamily', this.value)">
+              <option>Inter</option>
+              <option>Roboto</option>
+              <option>Poppins</option>
+              <option>Montserrat</option>
+              <option>Georgia</option>
+              <option>Times New Roman</option>
+              <option>JetBrains Mono</option>
+            </select>
+          </div>
+          <div class="props-row">
+            <div class="prop-group">
+              <label>Hajm</label>
+              <input type="number" id="propFontSize" class="prop-input" onchange="updateStyle('fontSize', this.value + 'px')" />
+            </div>
+            <div class="prop-group">
+              <label>Qalinlik</label>
+              <select id="propFontWeight" class="prop-select" onchange="updateStyle('fontWeight', this.value)">
+                <option value="300">Yengil</option>
+                <option value="400">Normal</option>
+                <option value="500">O'rta</option>
+                <option value="600">Yarim qalin</option>
+                <option value="700">Qalin</option>
+              </select>
+            </div>
+          </div>
+          <div class="prop-group full">
+            <label>Matn rangi</label>
+            <div class="color-input-wrap">
+              <input type="color" id="propColor" class="color-picker" onchange="updateStyle('color', this.value)" />
+              <input type="text" id="propColorHex" class="prop-input hex-input" placeholder="#000000" onchange="syncColor(this.value)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-label">Ko'rinish</div>
+          <div class="prop-group full">
+            <label>Fon rangi</label>
+            <div class="color-input-wrap">
+              <input type="color" id="propBg" class="color-picker" onchange="updateStyle('backgroundColor', this.value)" />
+              <input type="text" id="propBgHex" class="prop-input hex-input" placeholder="#ffffff" onchange="syncBgColor(this.value)" />
+            </div>
+          </div>
+          <div class="props-row">
+            <div class="prop-group">
+              <label>Chegara r.</label>
+              <input type="number" id="propRadius" class="prop-input" placeholder="0" onchange="updateStyle('borderRadius', this.value + 'px')" />
+            </div>
+            <div class="prop-group">
+              <label>Shaffoflik</label>
+              <input type="number" id="propOpacity" class="prop-input" min="0" max="100" placeholder="100" onchange="updateStyle('opacity', this.value / 100)" />
+            </div>
+          </div>
+          <div class="prop-group full">
+            <label>Chegara</label>
+            <input type="text" id="propBorder" class="prop-input" placeholder="1px solid #e2e8f0" onchange="updateStyle('border', this.value)" />
+          </div>
+          <div class="prop-group full">
+            <label>Soya</label>
+            <input type="text" id="propShadow" class="prop-input" placeholder="0 2px 8px rgba(0,0,0,0.1)" onchange="updateStyle('boxShadow', this.value)" />
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-label">Ichki bo'shliq (Padding)</div>
+          <div class="props-row four-col">
+            <div class="prop-group">
+              <label>⬆ Yuqori</label>
+              <input type="number" id="propPT" class="prop-input" onchange="updatePadding()" />
+            </div>
+            <div class="prop-group">
+              <label>➡ O'ng</label>
+              <input type="number" id="propPR" class="prop-input" onchange="updatePadding()" />
+            </div>
+            <div class="prop-group">
+              <label>⬇ Pastki</label>
+              <input type="number" id="propPB" class="prop-input" onchange="updatePadding()" />
+            </div>
+            <div class="prop-group">
+              <label>⬅ Chap</label>
+              <input type="number" id="propPL" class="prop-input" onchange="updatePadding()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-label">Tashqi bo'shliq (Margin)</div>
+          <div class="props-row four-col">
+            <div class="prop-group">
+              <label>⬆</label>
+              <input type="number" id="propMT" class="prop-input" onchange="updateMargin()" />
+            </div>
+            <div class="prop-group">
+              <label>➡</label>
+              <input type="number" id="propMR" class="prop-input" onchange="updateMargin()" />
+            </div>
+            <div class="prop-group">
+              <label>⬇</label>
+              <input type="number" id="propMB" class="prop-input" onchange="updateMargin()" />
+            </div>
+            <div class="prop-group">
+              <label>⬅</label>
+              <input type="number" id="propML" class="prop-input" onchange="updateMargin()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section danger-zone">
+          <button class="btn-danger full-width" onclick="deleteSelected()">🗑 Elementni o'chirish</button>
+          <button class="btn-secondary full-width mt-4" onclick="duplicateSelected()">⧉ Nusxa olish</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ===== CODE EDITOR VIEW ===== -->
+  <div class="view-overlay" id="codeView" style="display:none">
+    <div class="code-editor-layout">
+      <div class="code-tabs">
+        <button class="code-tab active" onclick="switchCodeTab('html')">HTML</button>
+        <button class="code-tab" onclick="switchCodeTab('css')">CSS</button>
+        <button class="code-tab" onclick="switchCodeTab('js')">JavaScript</button>
+        <div class="code-tab-spacer"></div>
+        <button class="btn-secondary small" onclick="formatCode()">✦ Formatlash</button>
+        <button class="btn-primary small" onclick="applyCodeChanges()">✓ Qo'llash</button>
+      </div>
+      <div class="code-editor-wrap">
+        <textarea class="code-editor" id="htmlEditor" placeholder="<!-- HTML kodingiz shu yerda -->"></textarea>
+        <textarea class="code-editor" id="cssEditor" placeholder="/* CSS stillar */" style="display:none"></textarea>
+        <textarea class="code-editor" id="jsEditor" placeholder="// JavaScript kodi" style="display:none"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PREVIEW VIEW ===== -->
+  <div class="view-overlay" id="previewView" style="display:none">
+    <div class="preview-toolbar">
+      <div class="preview-devices">
+        <button class="device-btn active" onclick="setPreviewDevice('desktop')" title="Desktop">🖥</button>
+        <button class="device-btn" onclick="setPreviewDevice('tablet')" title="Tablet">📱</button>
+        <button class="device-btn" onclick="setPreviewDevice('mobile')" title="Mobil">📲</button>
+      </div>
+      <span class="preview-url">localhost:preview</span>
+      <button class="btn-secondary small" onclick="openFullPreview()">↗ To'liq ko'rish</button>
+    </div>
+    <div class="preview-frame-wrap" id="previewFrameWrap">
+      <iframe id="previewFrame" class="preview-frame"></iframe>
+    </div>
+  </div>
+
+  <!-- ===== DATA VIEW ===== -->
+  <div class="view-overlay" id="dataView" style="display:none">
+    <div class="data-layout">
+      <div class="data-sidebar">
+        <div class="section-label">SheetDB Ulanish</div>
+        <div class="prop-group full">
+          <label>API URL</label>
+          <input type="text" id="sheetdbUrl" class="prop-input" placeholder="https://sheetdb.io/api/v1/..." />
+        </div>
+        <button class="btn-primary full-width" onclick="connectSheetDB()">🔗 Ulash</button>
+        <div class="connection-status" id="connectionStatus"></div>
+
+        <div class="section-label mt-16">Jadvallar</div>
+        <div class="table-list" id="tableList">
+          <p class="empty-hint">Hali jadval yo'q</p>
+        </div>
+        <button class="btn-secondary full-width mt-8" onclick="loadSheetData()">🔄 Ma'lumotlarni yuklash</button>
+      </div>
+
+      <div class="data-main">
+        <div class="data-toolbar">
+          <input type="text" class="search-input" placeholder="🔍 Qidirish..." oninput="filterTableData(this.value)" />
+          <button class="btn-secondary small" onclick="addRow()">+ Qator qo'shish</button>
+          <button class="btn-secondary small" onclick="exportCSV()">📥 CSV yuklab olish</button>
+        </div>
+        <div class="data-table-wrap">
+          <table class="data-table" id="dataTable">
+            <thead id="dataTableHead"></thead>
+            <tbody id="dataTableBody">
+              <tr><td colspan="10" class="empty-cell">SheetDB API URLni kiritib, "Ulash" tugmasini bosing</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST NOTIFICATIONS ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== CONTEXT MENU ===== -->
+  <div class="context-menu" id="contextMenu" style="display:none">
+    <div class="ctx-item" onclick="duplicateSelected()">⧉ Nusxa olish</div>
+    <div class="ctx-item" onclick="copyStyles()">🎨 Stilni nusxalash</div>
+    <div class="ctx-item" onclick="pasteStyles()">📋 Stilni joylashtirish</div>
+    <div class="ctx-separator"></div>
+    <div class="ctx-item" onclick="bringToFront()">⬆ Yuqoriga</div>
+    <div class="ctx-item" onclick="sendToBack()">⬇ Pastga</div>
+    <div class="ctx-separator"></div>
+    <div class="ctx-item danger" onclick="deleteSelected()">🗑 O'chirish</div>
+  </div>
+
+  <!-- ===== EXPORT MODAL ===== -->
+  <div class="modal-overlay" id="exportModal" style="display:none" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Loyihani eksport qilish</h3>
+        <button class="modal-close" onclick="document.getElementById('exportModal').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="export-options">
+          <div class="export-option" onclick="exportAs('html')">
+            <span class="export-icon">📄</span>
+            <strong>HTML fayl</strong>
+            <p>Yagona HTML fayl sifatida</p>
+          </div>
+          <div class="export-option" onclick="exportAs('zip')">
+            <span class="export-icon">📦</span>
+            <strong>ZIP arxiv</strong>
+            <p>HTML + CSS + JS fayllar</p>
+          </div>
+          <div class="export-option" onclick="exportAs('json')">
+            <span class="export-icon">🗂</span>
+            <strong>JSON loyiha</strong>
+            <p>Keyinchalik tahrirlash uchun</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="billing.js"></script>
+  <script src="bot_template.js"></script>
 </body>
 </html>
