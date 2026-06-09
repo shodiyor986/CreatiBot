@@ -1,116 +1,149 @@
+"""
+/start va /help handlerlari
+"""
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from sheet_manager import SheetManager
-from code_interpreter import SCRATCH_TEMPLATES
-import json
-from config import FREE_USER_BOT_LIMIT, PREMIUM_USER_BOT_LIMIT
+from config import MESSAGES, WEBAPP_URL
+from utils.sheet_manager import sheet
 
-sheet_manager = SheetManager()
 
-async def cmd_new_bot(message: types.Message):
-    """Yangi bot yaratish"""
-    user_id = message.from_user.id
-    user = sheet_manager.get_user(user_id)
-    
-    # Bot yaratish limitini tekshirish
-    bots_count = len(sheet_manager.get_user_bots(user_id))
-    
-    if user and user.get('is_premium') == "TRUE":
-        max_bots = PREMIUM_USER_BOT_LIMIT
-    else:
-        max_bots = FREE_USER_BOT_LIMIT
-    
-    if bots_count >= max_bots:
-        await message.answer(
-            f"❌ Siz bot yaratish limitiga yetdingiz!\n\n"
-            f"📊 Siz {bots_count}/{max_bots} ta bot yaratdingiz.\n\n"
-            f"🌟 Ko'proq bot yaratish uchun /subscribe orqali premium obuna oling!"
-        )
-        return
-    
-    # Bot turlari menyusi
-    keyboard = InlineKeyboardMarkup(row_width=2)
-    
-    for bot_type, template in SCRATCH_TEMPLATES.items():
-        keyboard.add(InlineKeyboardButton(
-            text=f"📦 {template['name']}",
-            callback_data=f"create_{bot_type}"
-        ))
-    
-    await message.answer(
-        "🤖 *Yangi bot yaratish*\n\n"
-        "Bot turini tanlang:\n\n"
-        "• *Oddiy tugmali bot* - Tugmalar bilan ishlaydi\n"
-        "• *Xabar yuboruvchi bot* - Avtomatik javob beradi\n"
-        "• *Web App bot* - Veb-ilova bilan ishlaydi\n\n"
-        f"📊 Siz {bots_count}/{max_bots} ta bot yaratdingiz.",
-        parse_mode="Markdown",
-        reply_markup=keyboard
+def get_main_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """Asosiy menyu tugmalari"""
+    is_prem = sheet.is_premium(user_id)
+
+    kb = InlineKeyboardMarkup(row_width=2)
+    kb.add(
+        InlineKeyboardButton("🤖 Yangi bot yaratish", callback_data="create_bot"),
+        InlineKeyboardButton("📋 Mening botlarim", callback_data="my_bots"),
+    )
+    kb.add(
+        InlineKeyboardButton("📢 Kanallarim", callback_data="my_channels"),
+        InlineKeyboardButton("💎 Premium" + (" ✅" if is_prem else ""), callback_data="premium"),
+    )
+    kb.add(
+        InlineKeyboardButton("🌐 WebApp ni ochish", web_app=types.WebAppInfo(url=WEBAPP_URL))
+    )
+    kb.add(
+        InlineKeyboardButton("❓ Yordam", callback_data="help"),
+        InlineKeyboardButton("📊 Statistika", callback_data="stats"),
+    )
+    return kb
+
+
+async def cmd_start(message: types.Message):
+    """Startga javob"""
+    user = message.from_user
+
+    # Foydalanuvchini bazaga saqlash
+    sheet.create_user(
+        telegram_id=user.id,
+        username=user.username,
+        first_name=user.first_name
     )
 
-async def process_bot_creation(callback_query: types.CallbackQuery):
-    """Bot yaratish jarayoni"""
-    bot_type = callback_query.data.replace('create_', '')
-    template = SCRATCH_TEMPLATES[bot_type]
-    
-    # FSM ga o'xshash oddiy saqlash
-    # (oddiy holatda foydalanuvchi ma'lumotlarini vaqtincha saqlaymiz)
-    user_data = {
-        'bot_type': bot_type,
-        'template': template,
-        'step': 'waiting_name'
-    }
-    
-    await callback_query.message.edit_text(
-        f"✅ Siz *{template['name']}* yaratishni tanladingiz\n\n"
-        f"📝 *1-qadam:* Bot nomini kiriting\n"
-        f"Misol: `Mening Botim`\n\n"
-        f"Bot nomi foydalanuvchilarga ko'rinadi.",
-        parse_mode="Markdown"
-    )
-    await callback_query.answer()
+    db_user = sheet.get_user(user.id)
+    is_prem = db_user and db_user.get("is_premium") == "true"
 
-async def create_bot_from_webapp(message, bot_name, bot_username, bot_type, scratch_code):
-    """WebApp dan bot yaratish"""
-    user = sheet_manager.get_user(message.from_user.id)
-    
-    # Limit tekshirish
-    bots_count = len(sheet_manager.get_user_bots(message.from_user.id))
-    max_bots = PREMIUM_USER_BOT_LIMIT if user.get('is_premium') == "TRUE" else FREE_USER_BOT_LIMIT
-    
-    if bots_count >= max_bots:
-        await message.answer("❌ Siz bot yaratish limitiga yetdingiz!")
-        return
-    
-    # BotFather orqali bot yaratish
-    from bot_father_api import BotFatherAPI
-    bot_father = BotFatherAPI()
-    
-    try:
-        # Haqiqiy bot yaratish (bu yerda mock, aslida BotFather API kerak)
-        bot_token = f"mock_token_{message.from_user.id}_{bot_username}"
-        
-        # Botni saqlash
-        bot_data = {
-            'token': bot_token,
-            'name': bot_name,
-            'username': bot_username,
-            'owner_id': message.from_user.id,
-            'bot_type': bot_type,
-            'scratch_code': json.dumps(scratch_code),
-            'status': 'active'
-        }
-        
-        sheet_manager.save_bot(bot_data)
-        
-        await message.answer(
-            f"✅ *Bot muvaffaqiyatli yaratildi!*\n\n"
-            f"🤖 Nomi: {bot_name}\n"
-            f"🔗 Username: @{bot_username}\n"
-            f"🔑 Token: `{bot_token}`\n\n"
-            f"Botni sinab ko'ring: t.me/{bot_username}",
-            parse_mode="Markdown"
-        )
-    
-    except Exception as e:
-        await message.answer(f"❌ Xatolik: {str(e)}")
+    text = (
+        f"👋 Salom, <b>{user.first_name}</b>!\n\n"
+        f"🤖 <b>BotForge</b> ga xush kelibsiz!\n\n"
+        f"Bu yerda hech qanday dasturlash bilimisiz "
+        f"o'z Telegram botingizni yaratishingiz mumkin.\n\n"
+        f"{'💎 <b>Premium</b> foydalanuvchi' if is_prem else '🆓 Bepul foydalanuvchi'}\n\n"
+        f"👇 Quyidagi menyudan tanlang:"
+    )
+
+    await message.answer(text, reply_markup=get_main_keyboard(user.id))
+
+
+async def cmd_help(message: types.Message):
+    """Yordam"""
+    help_text = (
+        "❓ <b>BotForge - Yordam</b>\n\n"
+        "📌 <b>Buyruqlar:</b>\n"
+        "/start - Asosiy menyu\n"
+        "/newbot - Yangi bot yaratish\n"
+        "/mybots - Mening botlarim\n"
+        "/subscribe - Premium obuna\n"
+        "/channels - Kanallarni boshqarish\n\n"
+        "🤖 <b>Bot turlari:</b>\n"
+        "1. Tugmali bot - inline va reply tugmalar\n"
+        "2. Xabar yuboruvchi - keyword asosida javob\n"
+        "3. Web App bot - to'liq veb-interfeys\n\n"
+        "💎 <b>Premium imkoniyatlari:</b>\n"
+        "• 10 tagacha bot yaratish\n"
+        "• Kanal boshqaruvi\n"
+        "• Cheksiz xabar yuborish\n"
+        "• Ustuvor yordam\n\n"
+        "📞 Muammo bo'lsa: @BotForgeSupport"
+    )
+    kb = InlineKeyboardMarkup()
+    kb.add(InlineKeyboardButton("🏠 Asosiy menyu", callback_data="main_menu"))
+    await message.answer(help_text, reply_markup=kb)
+
+
+async def callback_main_menu(callback: types.CallbackQuery):
+    """Asosiy menyu ga qaytish"""
+    user = callback.from_user
+    is_prem = sheet.is_premium(user.id)
+
+    text = (
+        f"🏠 <b>Asosiy menyu</b>\n\n"
+        f"👤 {user.first_name}\n"
+        f"{'💎 Premium' if is_prem else '🆓 Bepul'} foydalanuvchi"
+    )
+
+    await callback.message.edit_text(text, reply_markup=get_main_keyboard(user.id))
+    await callback.answer()
+
+
+async def callback_help(callback: types.CallbackQuery):
+    """Yordam callback"""
+    help_text = (
+        "❓ <b>Yordam</b>\n\n"
+        "Bot yaratish uchun '🤖 Yangi bot yaratish' ni bosing.\n\n"
+        "Savollar uchun: @BotForgeSupport"
+    )
+    kb = InlineKeyboardMarkup()
+    kb.add(InlineKeyboardButton("⬅️ Orqaga", callback_data="main_menu"))
+    await callback.message.edit_text(help_text, reply_markup=kb)
+    await callback.answer()
+
+
+async def callback_stats(callback: types.CallbackQuery):
+    """Shaxsiy statistika"""
+    user_id = callback.from_user.id
+    db_user = sheet.get_user(user_id)
+    bots = sheet.get_user_bots(user_id)
+    channels = sheet.get_user_channels(user_id)
+    is_prem = sheet.is_premium(user_id)
+
+    text = (
+        f"📊 <b>Mening statistikam</b>\n\n"
+        f"🤖 Botlar: {len(bots)} ta\n"
+        f"📢 Kanallar: {len(channels)} ta\n"
+        f"{'💎 Premium: ✅' if is_prem else '🆓 Premium: ❌'}\n\n"
+    )
+
+    if is_prem and db_user:
+        premium_until = db_user.get("premium_until", "")
+        if premium_until:
+            from datetime import datetime
+            try:
+                exp = datetime.fromisoformat(premium_until)
+                text += f"📅 Premium muddati: {exp.strftime('%d.%m.%Y')}\n"
+            except:
+                pass
+
+    kb = InlineKeyboardMarkup()
+    kb.add(InlineKeyboardButton("⬅️ Orqaga", callback_data="main_menu"))
+    await callback.message.edit_text(text, reply_markup=kb)
+    await callback.answer()
+
+
+def register_handlers(dp):
+    dp.register_message_handler(cmd_start, commands=["start"])
+    dp.register_message_handler(cmd_help, commands=["help"])
+    dp.register_callback_query_handler(callback_main_menu, lambda c: c.data == "main_menu")
+    dp.register_callback_query_handler(callback_help, lambda c: c.data == "help")
+    dp.register_callback_query_handler(callback_stats, lambda c: c.data == "stats")
