@@ -1,11 +1,11 @@
-from .sheet_manager import sheet, SheetManager
-from .payment import paystack, usdt, generate_transaction_id
-from .channel_api import (
-    send_message_to_channel,
-    get_chat_info,
-    get_channel_members_count,
-    ban_user_from_channel,
-    unban_user_from_channel,
-    check_bot_is_admin
-)
-from .code_interpreter import interpret_scratch_code, validate_scratch_code
+from . import start, create_bot, my_bots, subscription, channel_manager, admin_panel
+
+
+def register_all_handlers(dp):
+    """Barcha handlerlarni ro'yxatdan o'tkazish"""
+    start.register_handlers(dp)
+    create_bot.register_handlers(dp)
+    my_bots.register_handlers(dp)
+    subscription.register_handlers(dp)
+    channel_manager.register_handlers(dp)
+    admin_panel.register_handlers(dp)
