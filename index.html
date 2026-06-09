@@ -2,132 +2,59 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>BotForge - Bot Yaratuvchi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreatiBot - NoCode Web App Panel</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon">🤖</div>
-                <div class="logo-text">BotForge</div>
-            </div>
-            <div id="userBadge" class="tag tag-primary">🆓 Bepul</div>
+    <div id="app-container">
+        <h2>🛠 CreatiBot Konstruktor</h2>
+        <p id="user-info">Yuklanmoqda...</p>
+
+        <hr>
+
+        <div class="section" id="bot-settings">
+            <h3>1. Bot Sozlamalari</h3>
+            <label>BotFather Bergan Token:</label>
+            <input type="text" id="bot-token" placeholder="123456:ABC-DEF...">
+            <button onclick="saveBotSettings()">Tokenni Saqlash</button>
         </div>
 
-        <!-- Xush kelibsiz xabari -->
-        <div class="glass-card" style="margin-bottom: 20px; text-align: center;">
-            <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
-            <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">
-                Botingizni yarating!
-            </h2>
-            <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
-                Hech qanday dasturlash bilimisiz, vizual bloklar bilan o'z Telegram botingizni yarating
-            </p>
+        <div class="section" id="designer-panel">
+            <h3>2. Bot/Web App Dizayni</h3>
+            
+            <label>Ilova Sarlavhasi (Header):</label>
+            <input type="text" id="app-title" placeholder="Mening Onlayn Do'konim">
+
+            <label>Asosiy Rang (Hex):</label>
+            <input type="color" id="app-color" value="#3498db">
+
+            <label>Bot uchun Rasm (Banner):</label>
+            <input type="file" id="app-image" accept="image/*">
+            <small id="upload-status"></small>
+
+            <label>Tugma Matni:</label>
+            <input type="text" id="btn-text" placeholder="🛍 Buyurtma berish">
+
+            <button onclick="saveDesign()" class="success-btn">Dizaynni Saqlash va URL olish</button>
         </div>
 
-        <!-- Bot turlari -->
-        <div class="section-title">🎯 Bot turini tanlang</div>
-
-        <div class="bot-card" onclick="openEditor('button')">
-            <span class="card-emoji">🎛</span>
-            <div class="card-title">Tugmali bot</div>
-            <div class="card-desc">Inline va reply tugmalar bilan ishlaydigan interaktiv bot</div>
-            <div style="margin-top: 12px;">
-                <span class="tag tag-success">Eng mashhur</span>
-            </div>
+        <div class="section hidden" id="url-output">
+            <h3>🎉 Bot Web App Tayyor!</h3>
+            <p>Quyidagi URL manzilini nusxalang va BotFather'dagi botingizga (New Web App) joylashtiring:</p>
+            <input type="text" id="generated-url" readonly onclick="this.select()">
         </div>
 
-        <div class="bot-card" onclick="openEditor('message')">
-            <span class="card-emoji">💬</span>
-            <div class="card-title">Xabar yuboruvchi bot</div>
-            <div class="card-desc">Kalit so'zlar asosida avtomatik javob beradigan bot</div>
-            <div style="margin-top: 12px;">
-                <span class="tag tag-primary">Avto-javob</span>
-            </div>
+        <div class="section hidden" id="billing-section">
+            <h3 style="color: red;">⚠️ Obuna muddati tugagan</h3>
+            <p>Botni faollashtirish uchun 15$ to'lov qiling.</p>
+            <button onclick="redirectToPayme()" class="pay-btn">Payme orqali to'lash</button>
+            <button onclick="redirectToClick()" class="pay-btn">Click orqali to'lash</button>
         </div>
-
-        <div class="bot-card" id="webappCard" onclick="openEditor('webapp')">
-            <span class="card-emoji">🌐</span>
-            <div class="card-title">Web App bot</div>
-            <div class="card-desc">To'liq veb-interfeysga ega zamonaviy bot</div>
-            <div style="margin-top: 12px;">
-                <span class="tag tag-primary" id="webappBadge">💎 Premium</span>
-            </div>
-        </div>
-
-        <!-- Dashboard ga o'tish -->
-        <a href="dashboard.html">
-            <button class="btn btn-secondary" style="margin-top: 8px;">
-                📊 Dashboard ga o'tish
-            </button>
-        </a>
-
-        <div class="bottom-space"></div>
     </div>
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
-
-    <script>
-        // Telegram WebApp sozlash
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.setHeaderColor('#0f0c29');
-        tg.setBackgroundColor('#0f0c29');
-
-        // Foydalanuvchi ma'lumotlari
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            // Premium statusni tekshirish (localStorage dan)
-            const isPremium = localStorage.getItem(`premium_${user.id}`) === 'true';
-            const badge = document.getElementById('userBadge');
-            if (isPremium) {
-                badge.textContent = '💎 Premium';
-                badge.className = 'tag';
-                badge.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.3), rgba(217,119,6,0.3))';
-                badge.style.color = '#fcd34d';
-                badge.style.borderColor = 'rgba(245,158,11,0.4)';
-
-                // Premium bo'lsa webapp badge ni o'zgartirish
-                document.getElementById('webappBadge').textContent = '✅ Mavjud';
-                document.getElementById('webappBadge').className = 'tag tag-success';
-            }
-        }
-
-        function openEditor(type) {
-            const isPremium = user ? localStorage.getItem(`premium_${user.id}`) === 'true' : false;
-
-            if (type === 'webapp' && !isPremium) {
-                showToast('💎 Web App bot faqat Premium uchun!');
-                // 2 soniyadan so'ng premium sahifaga o'tish
-                setTimeout(() => {
-                    window.location.href = 'payment.html';
-                }, 2000);
-                return;
-            }
-
-            // Editor ga o'tish
-            window.location.href = `editor.html?type=${type}`;
-        }
-
-        function showToast(msg, duration = 3000) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), duration);
-        }
-
-        // MainButton
-        tg.MainButton.text = "📊 Dashboard";
-        tg.MainButton.color = "#6366f1";
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => {
-            window.location.href = 'dashboard.html';
-        });
-    </script>
+    <script src="billing.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
