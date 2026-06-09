@@ -1,33 +1,82 @@
-import os
+# ============================================
+# BotForge - Barcha sozlamalar
+# ============================================
 
-# ========== TELEGRAM BOT SOZLAMALARI ==========
-MAIN_BOT_TOKEN = "8717279627:AAFV9R4nrVx2r5IyMv_hSozxCYw8ushWvNo"  # @BotFather dan olinadi
+# Asosiy bot token (BotFather dan olingan)
+MAIN_BOT_TOKEN = "8717279627:AAFV9R4nrVx2r5IyMv_hSozxCYw8ushWvNo"
 
-# ========== SIZNING MA'LUMOTLARINGIZ ==========
-# SheetDB API (siz berdingiz)
-SHEETDB_API_URL = "https://sheetdb.io/api/v1/53jj6rji62pdg"
+# Admin Telegram ID lari (o'zingizning ID ingizni qo'ying)
+ADMIN_IDS = [123456789]  # O'zingizning Telegram ID ingiz
 
-# Google Sheets (siz berdingiz)
+# WebApp URL (Render.com yoki ngrok dan olingan URL)
+WEBAPP_URL = "https://your-botforge.onrender.com"
+
+# ============================================
+# SheetDB API
+# ============================================
+SHEETDB_URL = "https://sheetdb.io/api/v1/53jj6rji62pdg"
+
+# ============================================
+# Google Sheets
+# ============================================
 GOOGLE_SHEET_ID = "1sAElOzcFFlfGAY3RNhjzYZnfGTCb8BNnWs35sC3Firo"
+GOOGLE_CREDENTIALS_FILE = "credentials.json"  # Service account JSON fayli
 
-# ImgBB API (siz berdingiz)
+# ============================================
+# ImgBB API (rasmlar uchun)
+# ============================================
 IMGBB_API_KEY = "99f8a9de82db58dc79c164cea4551235"
+IMGBB_URL = "https://api.imgbb.com/1/upload"
 
-# ========== TO'LOV TIZIMI ==========
-SUBSCRIPTION_PRICE = 15  # 1 oylik obuna narxi (USD)
+# ============================================
+# Paystack (karta to'lovi)
+# ============================================
+PAYSTACK_SECRET_KEY = "sk_live_YOUR_PAYSTACK_SECRET_KEY"
+PAYSTACK_PUBLIC_KEY = "pk_live_YOUR_PAYSTACK_PUBLIC_KEY"
+PAYSTACK_BASE_URL = "https://api.paystack.co"
 
-# Paystack to'lov (bepul, O'zbekistonda ishlaydi)
-PAYSTACK_SECRET_KEY = "your_paystack_secret_key"  # https://paystack.com dan
+# ============================================
+# USDT TRC20 to'lov
+# ============================================
+USDT_WALLET = "TYour_TRC20_Wallet_Address_Here"
+USDT_NETWORK = "TRC20"
 
-# USDT to'lov (ixtiyoriy)
-USDT_WALLET = "YOUR_USDT_TRC20_ADDRESS"
+# ============================================
+# Narxlar va limitlar
+# ============================================
+PREMIUM_PRICE_USD = 15
+PREMIUM_DAYS = 30
+FREE_BOT_LIMIT = 1
+PREMIUM_BOT_LIMIT = 10
 
-# ========== LIMITLAR ==========
-FREE_USER_BOT_LIMIT = 1      # Bepul foydalanuvchi oyiga 1 ta bot
-PREMIUM_USER_BOT_LIMIT = 10  # Premium foydalanuvchi oyiga 10 ta bot
+# ============================================
+# Kanal/Guruh sozlamalari
+# ============================================
+BOT_TYPES = {
+    "button": "Tugmali bot",
+    "message": "Xabar yuboruvchi bot",
+    "webapp": "Web App bot"
+}
 
-# ========== ADMIN ==========
-ADMIN_IDS = [6324270191]  # O'zingizning Telegram IDngizni qo'ying
+# ============================================
+# Xabarlar (o'zbek tilida)
+# ============================================
+MESSAGES = {
+    "welcome": """
+🤖 <b>BotForge ga xush kelibsiz!</b>
 
-# ========== WEBAPP ==========
-WEBAPP_URL = "https://your-domain.com"  # yoki ngrok URL
+Hech qanday dasturlash bilimisiz o'z Telegram botingizni yarating!
+
+✨ <b>Imkoniyatlar:</b>
+• Vizual bloklar bilan bot yaratish
+• Kanal va guruhlarni boshqarish
+• Avtomatik xabar yuborish
+• Premium: 10 tagacha bot
+
+👇 Quyidagi tugmalardan birini tanlang:
+""",
+    "not_premium": "❌ Bu funksiya faqat <b>Premium</b> foydalanuvchilar uchun!\n\n💎 /subscribe buyrug'i orqali obuna oling.",
+    "bot_limit_free": "❌ Siz allaqachon 1 ta bot yaratgansiz!\n\nKo'proq bot yaratish uchun <b>Premium</b> oling: /subscribe",
+    "bot_limit_premium": "❌ Siz 10 ta bot yaratganisz (maksimal limit)!",
+    "payment_pending": "⏳ To'lovingiz tekshirilmoqda...\n\nAdmin tasdiqlashini kuting. Odatda 5-30 daqiqa ketadi.",
+}
