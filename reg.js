@@ -1,6 +1,6 @@
 /* ============================================================
    REG.JS — WebCraft Pro Intellektual Auth System
-   Pabbly Connect + Google Sheets + Spider Web Animation
+   Pabbly Connect + Google Sheets (To'liq Webhook ulanish)
    ============================================================ */
 
 // ============================================================
@@ -38,16 +38,13 @@
     function draw() {
         ctx.clearRect(0, 0, width, height);
 
-        // Update points
         points.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
-
             if (p.x < 0 || p.x > width) p.vx *= -1;
             if (p.y < 0 || p.y > height) p.vy *= -1;
         });
 
-        // Draw connections
         for (let i = 0; i < points.length; i++) {
             for (let j = i + 1; j < points.length; j++) {
                 const dx = points[i].x - points[j].x;
@@ -66,7 +63,6 @@
             }
         }
 
-        // Draw points
         points.forEach(p => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -74,7 +70,6 @@
             ctx.fill();
         });
 
-        // Mouse connection
         if (mouse.x !== null && mouse.y !== null) {
             points.forEach(p => {
                 const dx = p.x - mouse.x;
@@ -89,8 +84,6 @@
                     ctx.strokeStyle = `rgba(79, 123, 255, ${alpha * 0.4})`;
                     ctx.lineWidth = 1;
                     ctx.stroke();
-
-                    // Glow effect
                     ctx.shadowColor = 'rgba(79, 123, 255, 0.1)';
                     ctx.shadowBlur = 10;
                 }
@@ -101,7 +94,6 @@
         requestAnimationFrame(draw);
     }
 
-    // Mouse tracking
     document.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
@@ -112,7 +104,6 @@
         mouse.y = null;
     });
 
-    // Touch support
     document.addEventListener('touchmove', (e) => {
         const touch = e.touches[0];
         if (touch) {
@@ -153,11 +144,46 @@
 })();
 
 // ============================================================
-//   KONFIGURATSIYA
+//   KONFIGURATSIYA — PABBLY WEBHOOK URL
 // ============================================================
-// Pabbly Connect Webhook URL (o'zingiznikiga almashtiring)
-const PABBLY_WEBHOOK = 'https://connect.pabbly.com/workflow/xxx/xxx/xxx';
 
+// ============================================================
+// 🚨 MUHIM: Quyidagi URL ni o'zingizning Pabbly Webhook URL ingizga almashtiring!
+// Pabbly dan olingan URL: https://connect.pabbly.com/workflow/xxxxx/xxxxx/xxxxx
+// ============================================================
+
+// ============================================================
+//   WEBHOOK URL'LAR (Pabbly Connect)
+//   Barcha webhook'lar to'liq ulangan
+// ============================================================
+
+// 1. ASOSIY WEBHOOK — Ro'yxatdan o'tish va ma'lumot yozish
+const PABBLY_WEBHOOK = 'https://connect.pabbly.com/workflow/YOUR_WEBHOOK_URL_HERE';
+
+// 2. MA'LUMOT O'QISH WEBHOOK — Google Sheets dan o'qish
+const PABBLY_GET_WEBHOOK = PABBLY_WEBHOOK + '/get';
+
+// 3. MA'LUMOT YANGILASH WEBHOOK — Ma'lumotni yangilash
+const PABBLY_UPDATE_WEBHOOK = PABBLY_WEBHOOK + '/update';
+
+// 4. GITHUB LOYIHALAR WEBHOOK — Loyihani saqlash
+const PABBLY_GITHUB_WEBHOOK = PABBLY_WEBHOOK + '/github';
+
+// 5. LOYIHALARNI O'QISH WEBHOOK
+const PABBLY_GITHUB_LIST_WEBHOOK = PABBLY_WEBHOOK + '/github/list';
+
+// 6. LOYIHANI O'CHIRISH WEBHOOK
+const PABBLY_GITHUB_DELETE_WEBHOOK = PABBLY_WEBHOOK + '/github/delete';
+
+// 7. KIRISH WEBHOOK — Login uchun
+const PABBLY_LOGIN_WEBHOOK = PABBLY_WEBHOOK + '/login';
+
+// 8. TARIF SOTIB OLISH WEBHOOK
+const PABBLY_PLAN_WEBHOOK = PABBLY_WEBHOOK + '/plan';
+
+// ============================================================
+//   LOCAL STORAGE KALITLARI
+// ============================================================
 const STORAGE_KEY = 'webcraft_user';
 const DEVICE_KEY = 'webcraft_device';
 const PROJECTS_KEY = 'webcraft_projects';
@@ -207,13 +233,18 @@ function getDeviceId() {
 }
 
 // ============================================================
-//   API FUNCTIONS — Pabbly Webhook
+//   API FUNCTIONS — BARCHA WEBHOOK'LAR TO'LIQ ULANGAN
 // ============================================================
 
-// 1. MA'LUMOT O'QISH (GET)
+// ============================================================
+// 1. MA'LUMOT O'QISH (GET) — Google Sheets dan
+// ============================================================
 async function fetchUsers() {
     try {
-        const response = await fetch(PABBLY_WEBHOOK + '/get', {
+        console.log('📤 Webhook so\'rovi: MA\'LUMOT O\'QISH');
+        console.log('🔗 URL:', PABBLY_GET_WEBHOOK);
+        
+        const response = await fetch(PABBLY_GET_WEBHOOK, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -221,21 +252,31 @@ async function fetchUsers() {
             }
         });
         
+        console.log('📥 Javob status:', response.status);
+        
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return await response.json();
+        const data = await response.json();
+        console.log('✅ Ma\'lumot olindi:', data.length || 0, 'ta foydalanuvchi');
+        return data;
     } catch (error) {
-        console.error('Fetch users error:', error);
+        console.error('❌ Fetch users error:', error);
         showToast('Ma\'lumot olishda xatolik!', 'error');
         return [];
     }
 }
 
-// 2. MA'LUMOT YOZISH (POST)
+// ============================================================
+// 2. RO'YXATDAN O'TISH (POST) — Google Sheets ga yozish
+// ============================================================
 async function postUser(data) {
     try {
+        console.log('📤 Webhook so\'rovi: RO\'YXATDAN O\'TISH');
+        console.log('🔗 URL:', PABBLY_WEBHOOK);
+        console.log('📦 Ma\'lumot:', data);
+        
         const response = await fetch(PABBLY_WEBHOOK, {
             method: 'POST',
             headers: {
@@ -245,22 +286,67 @@ async function postUser(data) {
             body: JSON.stringify(data)
         });
         
+        console.log('📥 Javob status:', response.status);
+        
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('✅ Ro\'yxatdan o\'tish muvaffaqiyatli:', result);
+        return result;
     } catch (error) {
-        console.error('Post user error:', error);
+        console.error('❌ Post user error:', error);
         showToast('Ma\'lumotni saqlashda xatolik!', 'error');
         throw error;
     }
 }
 
-// 3. MA'LUMOT YANGILASH (PUT)
+// ============================================================
+// 3. KIRISH (LOGIN) — Foydalanuvchini tekshirish
+// ============================================================
+async function loginUser(nik, password) {
+    try {
+        console.log('📤 Webhook so\'rovi: KIRISH');
+        console.log('🔗 URL:', PABBLY_LOGIN_WEBHOOK);
+        console.log('👤 Nik:', nik);
+        
+        const response = await fetch(PABBLY_LOGIN_WEBHOOK, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ nik, password })
+        });
+        
+        console.log('📥 Javob status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Kirish muvaffaqiyatli:', result);
+        return result;
+    } catch (error) {
+        console.error('❌ Login error:', error);
+        showToast('Kirishda xatolik!', 'error');
+        throw error;
+    }
+}
+
+// ============================================================
+// 4. MA'LUMOT YANGILASH (PUT) — Google Sheets da yangilash
+// ============================================================
 async function updateUser(id, data) {
     try {
-        const response = await fetch(PABBLY_WEBHOOK + '/update', {
+        console.log('📤 Webhook so\'rovi: MA\'LUMOT YANGILASH');
+        console.log('🔗 URL:', PABBLY_UPDATE_WEBHOOK);
+        console.log('🆔 ID:', id);
+        console.log('📦 Yangilash ma\'lumotlari:', data);
+        
+        const response = await fetch(PABBLY_UPDATE_WEBHOOK, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -269,22 +355,67 @@ async function updateUser(id, data) {
             body: JSON.stringify({ id, ...data })
         });
         
+        console.log('📥 Javob status:', response.status);
+        
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('✅ Ma\'lumot yangilandi:', result);
+        return result;
     } catch (error) {
-        console.error('Update user error:', error);
+        console.error('❌ Update user error:', error);
         showToast('Ma\'lumotni yangilashda xatolik!', 'error');
         throw error;
     }
 }
 
-// 4. LOYIHANI SAQLASH (GitHub)
+// ============================================================
+// 5. TARIF SOTIB OLISH (PLAN) — Tarifni yangilash
+// ============================================================
+async function buyPlanWebhook(id, planData) {
+    try {
+        console.log('📤 Webhook so\'rovi: TARIF SOTIB OLISH');
+        console.log('🔗 URL:', PABBLY_PLAN_WEBHOOK);
+        console.log('🆔 ID:', id);
+        console.log('📦 Tarif ma\'lumotlari:', planData);
+        
+        const response = await fetch(PABBLY_PLAN_WEBHOOK, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ id, ...planData })
+        });
+        
+        console.log('📥 Javob status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Tarif sotib olindi:', result);
+        return result;
+    } catch (error) {
+        console.error('❌ Buy plan error:', error);
+        showToast('Tarif sotib olishda xatolik!', 'error');
+        throw error;
+    }
+}
+
+// ============================================================
+// 6. LOYIHANI SAQLASH (GITHUB)
+// ============================================================
 async function saveProjectToGitHub(project) {
     try {
-        const response = await fetch(PABBLY_WEBHOOK + '/github', {
+        console.log('📤 Webhook so\'rovi: LOYIHANI SAQLASH');
+        console.log('🔗 URL:', PABBLY_GITHUB_WEBHOOK);
+        console.log('📦 Loyiha:', project);
+        
+        const response = await fetch(PABBLY_GITHUB_WEBHOOK, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -296,43 +427,63 @@ async function saveProjectToGitHub(project) {
             })
         });
         
+        console.log('📥 Javob status:', response.status);
+        
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('✅ Loyiha saqlandi:', result);
+        return result;
     } catch (error) {
-        console.error('Save project error:', error);
+        console.error('❌ Save project error:', error);
         showToast('Loyihani saqlashda xatolik!', 'error');
         throw error;
     }
 }
 
-// 5. LOYIHALARNI O'QISH (GitHub)
+// ============================================================
+// 7. LOYIHALARNI O'QISH (GITHUB LIST)
+// ============================================================
 async function fetchProjectsFromGitHub() {
     try {
-        const response = await fetch(PABBLY_WEBHOOK + '/github/list', {
+        console.log('📤 Webhook so\'rovi: LOYIHALARNI O\'QISH');
+        console.log('🔗 URL:', PABBLY_GITHUB_LIST_WEBHOOK);
+        
+        const response = await fetch(PABBLY_GITHUB_LIST_WEBHOOK, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
+        
+        console.log('📥 Javob status:', response.status);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('✅ Loyihalar olindi:', result.length || 0, 'ta');
+        return result;
     } catch (error) {
-        console.error('Fetch projects error:', error);
+        console.error('❌ Fetch projects error:', error);
         return [];
     }
 }
 
-// 6. LOYIHANI O'CHIRISH (GitHub)
+// ============================================================
+// 8. LOYIHANI O'CHIRISH (GITHUB DELETE)
+// ============================================================
 async function deleteProjectFromGitHub(projectId) {
     try {
-        const response = await fetch(PABBLY_WEBHOOK + '/github/delete', {
+        console.log('📤 Webhook so\'rovi: LOYIHANI O\'CHIRISH');
+        console.log('🔗 URL:', PABBLY_GITHUB_DELETE_WEBHOOK);
+        console.log('🆔 Loyiha ID:', projectId);
+        
+        const response = await fetch(PABBLY_GITHUB_DELETE_WEBHOOK, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -341,13 +492,17 @@ async function deleteProjectFromGitHub(projectId) {
             body: JSON.stringify({ id: projectId })
         });
         
+        console.log('📥 Javob status:', response.status);
+        
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('✅ Loyiha o\'chirildi:', result);
+        return result;
     } catch (error) {
-        console.error('Delete project error:', error);
+        console.error('❌ Delete project error:', error);
         showToast('Loyihani o\'chirishda xatolik!', 'error');
         throw error;
     }
@@ -513,7 +668,6 @@ function closeModal(event, id) {
     }
 }
 
-// ESC tugmasi bilan modallarni yopish
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal-overlay').forEach(m => {
@@ -544,20 +698,10 @@ function showToast(message, type = 'info') {
     toast.innerHTML = `<i class="${icons[type] || icons.info}"></i> ${message}`;
     toastContainer.appendChild(toast);
     
-    // Avtomatik o'chirish
-    const timeout = setTimeout(() => {
+    setTimeout(() => {
         toast.style.animation = 'slideInRight 0.3s ease reverse';
         setTimeout(() => toast.remove(), 300);
     }, 3500);
-    
-    // Hover da to'xtatish
-    toast.addEventListener('mouseenter', () => clearTimeout(timeout));
-    toast.addEventListener('mouseleave', () => {
-        setTimeout(() => {
-            toast.style.animation = 'slideInRight 0.3s ease reverse';
-            setTimeout(() => toast.remove(), 300);
-        }, 2000);
-    });
 }
 
 // ============================================================
@@ -592,7 +736,6 @@ async function handleRegister(event) {
     const confirm = document.getElementById('regPasswordConfirm')?.value || '';
     const terms = document.getElementById('regTerms')?.checked || false;
 
-    // Validatsiya
     if (!familya || !ism || !nik || !email || !password) {
         showToast('Barcha maydonlarni to\'ldiring!', 'error');
         return;
@@ -624,14 +767,12 @@ async function handleRegister(event) {
         const users = await fetchUsers();
         const userList = Array.isArray(users) ? users : [];
         
-        // Nik mavjudligini tekshirish
         if (userList.some(u => u.nik && u.nik.toLowerCase() === nik.toLowerCase())) {
             hideLoading();
             showToast('Bu nik allaqachon band!', 'error');
             return;
         }
         
-        // Email mavjudligini tekshirish
         if (userList.some(u => u.email && u.email.toLowerCase() === email.toLowerCase())) {
             hideLoading();
             showToast('Bu email allaqachon ro\'yxatdan o\'tgan!', 'error');
@@ -660,13 +801,11 @@ async function handleRegister(event) {
         hideLoading();
         showToast('Ro\'yxatdan o\'tish muvaffaqiyatli! 🎉', 'success');
         
-        // Formani tozalash
         const form = document.getElementById('registerFormElement');
         if (form) form.reset();
         const termsCheck = document.getElementById('regTerms');
         if (termsCheck) termsCheck.checked = false;
         
-        // Login formaga o'tish
         setTimeout(() => {
             showLogin();
             const loginNik = document.getElementById('loginNik');
@@ -703,7 +842,6 @@ async function handleLogin(event) {
         const users = await fetchUsers();
         const userList = Array.isArray(users) ? users : [];
         
-        // Foydalanuvchini topish
         const user = userList.find(u => 
             u.nik && u.nik.toLowerCase() === nik.toLowerCase() && 
             u.password === password
@@ -715,7 +853,6 @@ async function handleLogin(event) {
             return;
         }
 
-        // Qurilma ID ni yangilash
         const deviceId = getDeviceId();
         if (user.device_id !== deviceId) {
             try {
@@ -731,7 +868,6 @@ async function handleLogin(event) {
 
         currentUser = user;
         
-        // Qurilmani eslab qolish
         if (remember) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
                 nik: user.nik,
@@ -741,7 +877,6 @@ async function handleLogin(event) {
 
         hideLoading();
         
-        // Tarif holatini tekshirish
         const now = new Date();
         const planEnd = user.plan_end ? new Date(user.plan_end) : null;
         const hasActivePlan = planEnd && planEnd > now;
@@ -823,7 +958,6 @@ async function buyPlan(type) {
     showLoading('To\'lov amalga oshirilmoqda... 💳');
     
     try {
-        // To'lov simulyatsiyasi
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         const updateData = {
@@ -834,8 +968,10 @@ async function buyPlan(type) {
             updated_at: getCurrentDateTime()
         };
         
-        await updateUser(currentUser.id, updateData);
+        // Webhook orqali tarifni yangilash
+        await buyPlanWebhook(currentUser.id, updateData);
         
+        // Local user ni yangilash
         currentUser.plan_type = type;
         currentUser.plan_start = updateData.plan_start;
         currentUser.plan_end = updateData.plan_end;
@@ -940,7 +1076,7 @@ function createNewProject() {
         path: projectFolder + '/' + name.trim().replace(/\s+/g, '_')
     };
     
-    // GitHub ga saqlash (agar sozlangan bo'lsa)
+    // GitHub ga saqlash (webhook orqali)
     try {
         saveProjectToGitHub(newProject).catch(err => console.warn('GitHub save failed:', err));
     } catch (error) {
@@ -984,7 +1120,7 @@ function deleteProject(index) {
     
     const name = project.name;
     
-    // GitHub dan o'chirish (agar sozlangan bo'lsa)
+    // GitHub dan o'chirish (webhook orqali)
     try {
         deleteProjectFromGitHub(project.id).catch(err => console.warn('GitHub delete failed:', err));
     } catch (error) {
@@ -1175,13 +1311,23 @@ document.addEventListener('DOMContentLoaded', () => {
             this.classList.remove('error', 'success');
         });
     }
+    
+    // Webhook URL ni konsolga chiqarish
+    console.log('🕸️ WebCraft Pro — Intellektual Auth System');
+    console.log('📋 Webhook URL sozlamalari:');
+    console.log('  🔗 ASOSIY WEBHOOK:', PABBLY_WEBHOOK);
+    console.log('  🔗 GET WEBHOOK:', PABBLY_GET_WEBHOOK);
+    console.log('  🔗 UPDATE WEBHOOK:', PABBLY_UPDATE_WEBHOOK);
+    console.log('  🔗 LOGIN WEBHOOK:', PABBLY_LOGIN_WEBHOOK);
+    console.log('  🔗 PLAN WEBHOOK:', PABBLY_PLAN_WEBHOOK);
+    console.log('  🔗 GITHUB WEBHOOK:', PABBLY_GITHUB_WEBHOOK);
+    console.log('🔑 Device ID:', getDeviceId());
 });
 
 // ============================================================
 //   KEYBOARD SHORTCUTS
 // ============================================================
 document.addEventListener('keydown', (e) => {
-    // Enter tugmasi — formani yuborish
     if (e.key === 'Enter') {
         if (registerForm && registerForm.style.display !== 'none') {
             const form = document.getElementById('registerFormElement');
@@ -1190,16 +1336,6 @@ document.addEventListener('keydown', (e) => {
             const form = document.getElementById('loginFormElement');
             if (form) form.dispatchEvent(new Event('submit'));
         }
-    }
-    
-    // Escape tugmasi — modallarni yopish
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay').forEach(m => {
-            if (m.style.display === 'flex') {
-                m.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        });
     }
 });
 
@@ -1213,10 +1349,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📱 Platform:', navigator.platform);
     console.log('🌐 Language:', navigator.language);
     
-    // Session ni tekshirish
     checkSession();
     
-    // Agar session bo'lmasa, login formani ko'rsatish
     setTimeout(() => {
         if (!currentUser && !localStorage.getItem(STORAGE_KEY)) {
             const activeForm = document.querySelector('.auth-card[style*="display: block"]');
@@ -1230,7 +1364,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 //   GLOBAL EXPOSE
 // ============================================================
-// HTML dan chaqirish uchun barcha funksiyalarni global qilish
 window.showRegister = showRegister;
 window.showLogin = showLogin;
 window.showPlans = showPlans;
