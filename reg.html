@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>WebCraft Pro — Ro'yxatdan o'tish</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="reg.css">
+</head>
+<body>
+
+    <!-- ============================================================
+    AUTH CONTAINER
+    ============================================================ -->
+    <div class="auth-container" id="authContainer">
+        
+        <!-- ============================================================
+        BACKGROUND ANIMATION
+        ============================================================ -->
+        <div class="auth-bg">
+            <div class="auth-bg-circle auth-bg-circle-1"></div>
+            <div class="auth-bg-circle auth-bg-circle-2"></div>
+            <div class="auth-bg-circle auth-bg-circle-3"></div>
+        </div>
+
+        <!-- ============================================================
+        REGISTER FORM
+        ============================================================ -->
+        <div class="auth-card" id="registerForm">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <span class="logo-icon">⬡</span>
+                    <span class="logo-text">WebCraft <span class="logo-pro">Pro</span></span>
+                </div>
+                <h2>Ro'yxatdan o'tish</h2>
+                <p>WebCraft Pro ga xush kelibsiz! Hisob yarating</p>
+            </div>
+
+            <form id="registerFormElement" onsubmit="handleRegister(event)" novalidate>
+                <!-- Familya va Ism qatori -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regFamilya"><i class="fas fa-user"></i> Familiya</label>
+                        <input type="text" id="regFamilya" placeholder="Familiyangiz" required autocomplete="family-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="regIsm"><i class="fas fa-user"></i> Ism</label>
+                        <input type="text" id="regIsm" placeholder="Ismingiz" required autocomplete="given-name">
+                    </div>
+                </div>
+
+                <!-- Nik -->
+                <div class="form-group">
+                    <label for="regNik"><i class="fas fa-at"></i> Nik (Login)</label>
+                    <input type="text" id="regNik" placeholder="Nikingiz" required autocomplete="username">
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="regEmail"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="regEmail" placeholder="Email manzilingiz" required autocomplete="email">
+                </div>
+
+                <!-- Parol -->
+                <div class="form-group">
+                    <label for="regPassword"><i class="fas fa-lock"></i> Parol</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="regPassword" placeholder="Parol (6+ belgi)" required minlength="6" autocomplete="new-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)" aria-label="Parolni ko'rsatish/yashirish">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Parolni tasdiqlash -->
+                <div class="form-group">
+                    <label for="regPasswordConfirm"><i class="fas fa-check-circle"></i> Parolni tasdiqlang</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="regPasswordConfirm" placeholder="Parolni qayta kiriting" required autocomplete="new-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('regPasswordConfirm', this)" aria-label="Parolni ko'rsatish/yashirish">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ============================================================
+                SHARTLAR VA MAXFIYLIK SIYOSATI
+                ============================================================ -->
+                <div class="terms-container">
+                    <div class="terms-header" onclick="toggleTerms()" role="button" tabindex="0" aria-expanded="false">
+                        <i class="fas fa-file-contract"></i>
+                        <span>Shartlar va Maxfiylik siyosati</span>
+                        <i class="fas fa-chevron-down terms-arrow" id="termsArrow"></i>
+                    </div>
+                    <div class="terms-content" id="termsContent">
+                        <div class="terms-scroll">
+                            <h4><i class="fas fa-gavel"></i> Foydalanish shartlari</h4>
+                            <p>WebCraft Pro dan foydalanish orqali siz quyidagi shartlarga rozilik bildirasiz.</p>
+                            <p>Siz yaratgan barcha loyihalar faqat sizga tegishli va hech qanday uchinchi shaxs ularga ruxsatsiz kira olmaydi.</p>
+                            <p>Loyihalarni nashr qilish, tarqatish va tijoriy maqsadlarda foydalanish huquqi sizda.</p>
+                            <p>WebCraft Pro xizmat ko'rsatish huquqini o'zida saqlab qoladi va istalgan vaqtda xizmatni o'zgartirishi yoki to'xtatishi mumkin.</p>
+                            <p>Boshqa foydalanuvchilarning loyihalariga, hisob ma'lumotlariga yoki shaxsiy ma'lumotlariga ruxsatsiz kirish qat'iy taqiqlanadi.</p>
+                            <p>Xizmatdan noqonuniy maqsadlarda, zararli dasturlar tarqatish yoki boshqa foydalanuvchilarga zarar yetkazish uchun foydalanish taqiqlanadi.</p>
+                            <p>Siz o'zingizning hisob ma'lumotlaringiz xavfsizligi uchun javobgarsiz.</p>
+                            <p>Har qanday qoidabuzarlik holatida hisobingiz bloklanishi mumkin.</p>
+                            <p>WebCraft Pro barcha yangilanishlar va xatoliklarni tuzatish huquqiga ega.</p>
+                            <p>Ushbu shartlar istalgan vaqtda o'zgartirilishi mumkin, o'zgarishlar haqida foydalanuvchilar xabardor qilinadi.</p>
+
+                            <h4 style="margin-top:14px;"><i class="fas fa-shield-alt"></i> Maxfiylik siyosati</h4>
+                            <p><strong>Ma'lumotlar to'plami:</strong> Sizning ismingiz, familyangiz, nikingiz, email manzilingiz va parolingiz faqat hisobingizni boshqarish uchun yig'iladi.</p>
+                            <p><strong>Ma'lumotlardan foydalanish:</strong> Sizning ma'lumotlaringiz faqat quyidagi maqsadlarda ishlatiladi:</p>
+                            <p style="padding-left:20px;">- Hisobingizni boshqarish</p>
+                            <p style="padding-left:20px;">- Loyihalaringizni saqlash</p>
+                            <p style="padding-left:20px;">- Texnik qo'llab-quvvatlash</p>
+                            <p style="padding-left:20px;">- Xizmat haqida xabarlar yuborish</p>
+                            <p><strong>Ma'lumotlarni himoya qilish:</strong> Sizning barcha ma'lumotlaringiz xavfsiz serverlarda saqlanadi va hech qanday uchinchi shaxsga berilmaydi.</p>
+                            <p><strong>Qurilma ID si:</strong> Sizning qurilmangiz noyob ID si faqat qurilmangizni tanib olish va xavfsizlikni ta'minlash uchun ishlatiladi.</p>
+                            <p><strong>Loyihalar:</strong> Siz yaratgan loyihalar faqat sizning qurilmangizda saqlanadi va faqat siz ularga kira olasiz.</p>
+                            <p><strong>Hisobni o'chirish:</strong> Siz istalgan vaqtda hisobingizni o'chirib tashlashingiz mumkin, barcha ma'lumotlaringiz o'chiriladi.</p>
+                            <p><strong>Kuki (Cookie) fayllar:</strong> Faqat qurilmangizni eslab qolish uchun kuki fayllardan foydalanamiz.</p>
+                            <p><strong>Ma'lumotlarni yangilash:</strong> Siz istalgan vaqtda shaxsiy ma'lumotlaringizni yangilashingiz mumkin.</p>
+                            <p><strong>Xavfsizlik:</strong> Parolingiz hech qachon ochiq ko'rinishda saqlanmaydi va uzatilmaydi.</p>
+                            <p><strong>Aloqa:</strong> Maxfiylik siyosati haqida savollaringiz bo'lsa, biz bilan bog'lanishingiz mumkin.</p>
+
+                            <h4 style="margin-top:14px;"><i class="fas fa-database"></i> Ma'lumotlarni saqlash</h4>
+                            <p>Loyihalaringiz qurilmangizda saqlanadi.</p>
+                            <p>Hisob ma'lumotlari Google Sheets da xavfsiz saqlanadi.</p>
+                            <p>Har bir qurilma o'ziga xos ID ga ega.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shartlarga rozilik checkbox -->
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="regTerms" required>
+                        <span class="checkmark"></span>
+                        <span>Men <a href="#" onclick="event.preventDefault();openTermsModal()">shartlar</a> va <a href="#" onclick="event.preventDefault();openPrivacyModal()">maxfiylik siyosatiga</a> roziman</span>
+                    </label>
+                </div>
+
+                <!-- Ro'yxatdan o'tish tugmasi -->
+                <button type="submit" class="btn-primary full-width" id="registerBtn">
+                    <i class="fas fa-user-plus"></i> Ro'yxatdan o'tish
+                </button>
+
+                <!-- Kirish linki -->
+                <div class="auth-footer">
+                    <span>Hisobingiz bormi? <a href="#" onclick="showLogin()">Kirish</a></span>
+                </div>
+            </form>
+        </div>
+
+        <!-- ============================================================
+        LOGIN FORM
+        ============================================================ -->
+        <div class="auth-card" id="loginForm" style="display:none;">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <span class="logo-icon">⬡</span>
+                    <span class="logo-text">WebCraft <span class="logo-pro">Pro</span></span>
+                </div>
+                <h2>Kirish</h2>
+                <p>Hisobingizga kiring va loyihalarni boshqaring</p>
+            </div>
+
+            <form id="loginFormElement" onsubmit="handleLogin(event)" novalidate>
+                <!-- Nik -->
+                <div class="form-group">
+                    <label for="loginNik"><i class="fas fa-at"></i> Nik</label>
+                    <input type="text" id="loginNik" placeholder="Nikingiz" required autocomplete="username">
+                </div>
+
+                <!-- Parol -->
+                <div class="form-group">
+                    <label for="loginPassword"><i class="fas fa-lock"></i> Parol</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" placeholder="Parolingiz" required autocomplete="current-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)" aria-label="Parolni ko'rsatish/yashirish">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Eslab qolish va Parolni unutdingizmi -->
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="loginRemember">
+                        <span class="checkmark"></span>
+                        <span><i class="fas fa-device"></i> Qurilmani eslab qolish</span>
+                    </label>
+                    <a href="#" class="forgot-password" onclick="showToast('Parolni tiklash havolasi emailga yuborildi', 'info')">
+                        <i class="fas fa-question-circle"></i> Parolni unutdingizmi?
+                    </a>
+                </div>
+
+                <!-- Kirish tugmasi -->
+                <button type="submit" class="btn-primary full-width" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Kirish
+                </button>
+
+                <!-- Ro'yxatdan o'tish linki -->
+                <div class="auth-footer">
+                    <span>Hisobingiz yo'qmi? <a href="#" onclick="showRegister()">Ro'yxatdan o'tish</a></span>
+                </div>
+            </form>
+        </div>
+
+        <!-- ============================================================
+        PLANS (TARIFLAR)
+        ============================================================ -->
+        <div class="auth-card plans-card" id="plansForm" style="display:none;">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <span class="logo-icon">⬡</span>
+                    <span class="logo-text">WebCraft <span class="logo-pro">Pro</span></span>
+                </div>
+                <h2><i class="fas fa-crown" style="color:var(--warning);"></i> Tarif rejasini tanlang</h2>
+                <p>WebCraft Pro dan to'liq foydalanish uchun tarif sotib oling</p>
+                <div style="font-size:0.85rem;color:var(--text-muted);margin-top:6px;">
+                    <i class="fas fa-user"></i> <span id="plansUserNik">-</span>
+                    <span style="margin-left:16px;"><i class="fas fa-microchip"></i> <span id="plansDeviceId">-</span></span>
+                </div>
+            </div>
+
+            <div class="plans-grid">
+                <!-- 1 oylik -->
+                <div class="plan-card" onclick="selectPlan('monthly')" data-plan="monthly">
+                    <div class="plan-badge">Boshlang'ich</div>
+                    <div class="plan-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>1 oylik</h3>
+                    <div class="plan-price">49 000 <span>so'm</span></div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Barcha elementlar</li>
+                        <li><i class="fas fa-check"></i> 5 ta loyiha</li>
+                        <li><i class="fas fa-check"></i> API integratsiyasi</li>
+                        <li><i class="fas fa-check"></i> Standart qo'llab-quvvatlash</li>
+                    </ul>
+                    <button class="btn-plan" onclick="event.stopPropagation();buyPlan('monthly')">
+                        <i class="fas fa-shopping-cart"></i> Sotib olish
+                    </button>
+                </div>
+
+                <!-- 6 oylik -->
+                <div class="plan-card popular" onclick="selectPlan('halfyear')" data-plan="halfyear">
+                    <div class="plan-badge">⭐ Eng mashhur</div>
+                    <div class="plan-icon"><i class="fas fa-calendar-check"></i></div>
+                    <h3>6 oylik</h3>
+                    <div class="plan-price">199 000 <span>so'm</span></div>
+                    <div class="plan-save"><i class="fas fa-gift"></i> 2 oy bepul</div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Barcha elementlar</li>
+                        <li><i class="fas fa-check"></i> 20 ta loyiha</li>
+                        <li><i class="fas fa-check"></i> API integratsiyasi</li>
+                        <li><i class="fas fa-check"></i> 24/7 qo'llab-quvvatlash</li>
+                        <li><i class="fas fa-check"></i> Premium template'lar</li>
+                    </ul>
+                    <button class="btn-plan" onclick="event.stopPropagation();buyPlan('halfyear')">
+                        <i class="fas fa-shopping-cart"></i> Sotib olish
+                    </button>
+                </div>
+
+                <!-- 1 yillik -->
+                <div class="plan-card" onclick="selectPlan('yearly')" data-plan="yearly">
+                    <div class="plan-badge">👑 Premium</div>
+                    <div class="plan-icon"><i class="fas fa-crown"></i></div>
+                    <h3>1 yillik</h3>
+                    <div class="plan-price">349 000 <span>so'm</span></div>
+                    <div class="plan-save"><i class="fas fa-gift"></i> 4 oy bepul</div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Barcha elementlar</li>
+                        <li><i class="fas fa-check"></i> Cheksiz loyihalar</li>
+                        <li><i class="fas fa-check"></i> API integratsiyasi</li>
+                        <li><i class="fas fa-check"></i> VIP qo'llab-quvvatlash</li>
+                        <li><i class="fas fa-check"></i> Premium template'lar</li>
+                        <li><i class="fas fa-check"></i> Cheksiz AI so'rovlar</li>
+                    </ul>
+                    <button class="btn-plan" onclick="event.stopPropagation();buyPlan('yearly')">
+                        <i class="fas fa-shopping-cart"></i> Sotib olish
+                    </button>
+                </div>
+            </div>
+
+            <div class="plans-footer">
+                <button class="btn-secondary" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Chiqish
+                </button>
+                <span style="font-size:0.75rem;color:var(--text-muted);">
+                    <i class="fas fa-shield-alt"></i> Xavfsiz to'lov kafolati
+                </span>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        APP CARD (LOYIHALAR)
+        ============================================================ -->
+        <div class="auth-card app-card" id="appForm" style="display:none;">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <span class="logo-icon">⬡</span>
+                    <span class="logo-text">WebCraft <span class="logo-pro">Pro</span></span>
+                </div>
+                <h2><i class="fas fa-folder-open" style="color:var(--accent);"></i> Loyihalarim</h2>
+                <p>Barcha loyihalaringizni boshqaring</p>
+                <div style="font-size:0.85rem;color:var(--text-muted);margin-top:6px;">
+                    <i class="fas fa-user"></i> <span id="appUserNik">-</span>
+                    <span style="margin-left:16px;"><i class="fas fa-microchip"></i> <span id="appDeviceId">-</span></span>
+                    <span style="margin-left:16px;">
+                        <i class="fas fa-clock"></i> 
+                        <span id="appPlanStatus" style="color:var(--success);">Faol</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Amallar tugmalari -->
+            <div class="app-actions">
+                <button class="btn-primary" onclick="createNewProject()">
+                    <i class="fas fa-plus"></i> Yangi loyiha
+                </button>
+                <button class="btn-secondary" onclick="openProjectSettings()">
+                    <i class="fas fa-folder-open"></i> Papka ochish
+                </button>
+                <button class="btn-secondary" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Chiqish
+                </button>
+            </div>
+
+            <!-- Loyihalar ro'yxati -->
+            <div class="projects-list" id="projectsList">
+                <div class="empty-projects">
+                    <i class="fas fa-folder-open"></i>
+                    <p>Hali loyihalar mavjud emas</p>
+                    <span>"Yangi loyiha" tugmasini bosing</span>
+                </div>
+            </div>
+
+            <!-- Sozlamalar -->
+            <div class="app-settings">
+                <div class="settings-group">
+                    <label for="projectPath"><i class="fas fa-folder"></i> Loyihalarni saqlash papkasi</label>
+                    <div class="settings-row">
+                        <input type="text" id="projectPath" placeholder="Papka tanlanmagan" readonly>
+                        <button class="btn-secondary" onclick="openProjectSettings()">
+                            <i class="fas fa-folder-open"></i> Tanlash
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+    MODAL: SHARTLAR
+    ============================================================ -->
+    <div class="modal-overlay" id="termsModal" style="display:none;" onclick="closeModal(event,'termsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-contract"></i> Foydalanish shartlari</h3>
+                <button class="modal-close" onclick="closeModal(null,'termsModal')" aria-label="Yopish">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="terms-scroll">
+                    <h4><i class="fas fa-gavel"></i> WebCraft Pro Foydalanish shartlari</h4>
+                    <p><strong>1. Rozilik:</strong> WebCraft Pro dan foydalanish orqali siz quyidagi shartlarga rozilik bildirasiz.</p>
+                    <p><strong>2. Loyihalar mulki:</strong> Siz yaratgan barcha loyihalar faqat sizga tegishli va hech qanday uchinchi shaxs ularga ruxsatsiz kira olmaydi.</p>
+                    <p><strong>3. Foydalanish huquqi:</strong> Loyihalarni nashr qilish, tarqatish va tijoriy maqsadlarda foydalanish huquqi sizda.</p>
+                    <p><strong>4. Xizmat ko'rsatish:</strong> WebCraft Pro xizmat ko'rsatish huquqini o'zida saqlab qoladi va istalgan vaqtda xizmatni o'zgartirishi yoki to'xtatishi mumkin.</p>
+                    <p><strong>5. Ruxsatsiz kirish:</strong> Boshqa foydalanuvchilarning loyihalariga, hisob ma'lumotlariga yoki shaxsiy ma'lumotlariga ruxsatsiz kirish qat'iy taqiqlanadi.</p>
+                    <p><strong>6. Noqonuniy foydalanish:</strong> Xizmatdan noqonuniy maqsadlarda, zararli dasturlar tarqatish yoki boshqa foydalanuvchilarga zarar yetkazish uchun foydalanish taqiqlanadi.</p>
+                    <p><strong>7. Hisob xavfsizligi:</strong> Siz o'zingizning hisob ma'lumotlaringiz xavfsizligi uchun javobgarsiz.</p>
+                    <p><strong>8. Qoidabuzarlik:</strong> Har qanday qoidabuzarlik holatida hisobingiz bloklanishi mumkin.</p>
+                    <p><strong>9. Yangilanishlar:</strong> WebCraft Pro barcha yangilanishlar va xatoliklarni tuzatish huquqiga ega.</p>
+                    <p><strong>10. Shartlar o'zgarishi:</strong> Ushbu shartlar istalgan vaqtda o'zgartirilishi mumkin, o'zgarishlar haqida foydalanuvchilar xabardor qilinadi.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeModal(null,'termsModal')">
+                    <i class="fas fa-check"></i> Tushundim
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    MODAL: MAXFIYLIK SIYOSATI
+    ============================================================ -->
+    <div class="modal-overlay" id="privacyModal" style="display:none;" onclick="closeModal(event,'privacyModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Maxfiylik siyosati</h3>
+                <button class="modal-close" onclick="closeModal(null,'privacyModal')" aria-label="Yopish">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="terms-scroll">
+                    <h4><i class="fas fa-shield-alt"></i> WebCraft Pro Maxfiylik siyosati</h4>
+                    <p><strong>1. Ma'lumotlar to'plami:</strong> Sizning ismingiz, familyangiz, nikingiz, email manzilingiz va parolingiz faqat hisobingizni boshqarish uchun yig'iladi.</p>
+                    <p><strong>2. Ma'lumotlardan foydalanish:</strong> Sizning ma'lumotlaringiz faqat quyidagi maqsadlarda ishlatiladi:</p>
+                    <p style="padding-left:20px;">- Hisobingizni boshqarish</p>
+                    <p style="padding-left:20px;">- Loyihalaringizni saqlash</p>
+                    <p style="padding-left:20px;">- Texnik qo'llab-quvvatlash</p>
+                    <p style="padding-left:20px;">- Xizmat haqida xabarlar yuborish</p>
+                    <p><strong>3. Ma'lumotlarni himoya qilish:</strong> Sizning barcha ma'lumotlaringiz xavfsiz serverlarda saqlanadi va hech qanday uchinchi shaxsga berilmaydi.</p>
+                    <p><strong>4. Qurilma ID si:</strong> Sizning qurilmangiz noyob ID si faqat qurilmangizni tanib olish va xavfsizlikni ta'minlash uchun ishlatiladi.</p>
+                    <p><strong>5. Loyihalar:</strong> Siz yaratgan loyihalar faqat sizning qurilmangizda saqlanadi va faqat siz ularga kira olasiz.</p>
+                    <p><strong>6. Hisobni o'chirish:</strong> Siz istalgan vaqtda hisobingizni o'chirib tashlashingiz mumkin, barcha ma'lumotlaringiz o'chiriladi.</p>
+                    <p><strong>7. Kuki (Cookie) fayllar:</strong> Faqat qurilmangizni eslab qolish uchun kuki fayllardan foydalanamiz.</p>
+                    <p><strong>8. Ma'lumotlarni yangilash:</strong> Siz istalgan vaqtda shaxsiy ma'lumotlaringizni yangilashingiz mumkin.</p>
+                    <p><strong>9. Xavfsizlik:</strong> Parolingiz hech qachon ochiq ko'rinishda saqlanmaydi va uzatilmaydi.</p>
+                    <p><strong>10. Aloqa:</strong> Maxfiylik siyosati haqida savollaringiz bo'lsa, biz bilan bog'lanishingiz mumkin.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeModal(null,'privacyModal')">
+                    <i class="fas fa-check"></i> Tushundim
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    MODAL: PAPKA TANLASH
+    ============================================================ -->
+    <div class="modal-overlay" id="folderModal" style="display:none;" onclick="closeModal(event,'folderModal')">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-folder-open"></i> Papkani tanlang</h3>
+                <button class="modal-close" onclick="closeModal(null,'folderModal')" aria-label="Yopish">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.9rem;">
+                    <i class="fas fa-info-circle" style="color:var(--accent);"></i>
+                    Loyihalaringiz saqlanadigan papkani tanlang:
+                </p>
+                
+                <div class="folder-browser">
+                    <div class="folder-item" onclick="selectFolder('Desktop')">
+                        <i class="fas fa-desktop"></i> Ish stoli
+                    </div>
+                    <div class="folder-item" onclick="selectFolder('Documents')">
+                        <i class="fas fa-file-alt"></i> Hujjatlar
+                    </div>
+                    <div class="folder-item" onclick="selectFolder('Downloads')">
+                        <i class="fas fa-download"></i> Yuklab olishlar
+                    </div>
+                    <div class="folder-item" onclick="selectFolder('WebCraft_Pro')">
+                        <i class="fas fa-folder"></i> WebCraft_Pro
+                    </div>
+                    <div class="folder-item" onclick="selectFolder('custom')">
+                        <i class="fas fa-plus-circle" style="color:var(--accent);"></i> Boshqa...
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:16px;">
+                    <label for="customFolderInput"><i class="fas fa-pen"></i> Yoki papka manzilini kiriting:</label>
+                    <input type="text" id="customFolderInput" placeholder="Masalan: C:/Users/.../WebCraft_Pro/">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal(null,'folderModal')">
+                    <i class="fas fa-times"></i> Bekor qilish
+                </button>
+                <button class="btn-primary" onclick="saveFolderSelection()">
+                    <i class="fas fa-save"></i> Saqlash
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================================
+    LOADING OVERLAY
+    ============================================================ -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="loading-spinner"></div>
+        <p id="loadingText">Iltimos kuting...</p>
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script src="reg.js"></script>
+
+</body>
+</html>
